@@ -1,0 +1,54 @@
+{
+  "Count": 3,
+  "Message": "Results returned successfully",
+  "results": [
+    {
+      "Manufacturer": "Ford Motor Company",
+      "NHTSACampaignNumber": "21V155000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "10/03/2021",
+      "Component": "TIRES",
+      "Summary": "Ford Motor Company (Ford) is recalling certain 2018 F-150, 2018-2020 F-250, F-350, and 2019 Escape vehicles equipped with Continental tires.  On the affected vehicles, it is possible that one or more tires were cured for too long during tire production.",
+      "Consequence": "Over cured tires may develop a break in the sidewall, resulting in sudden air loss or belt edge separation which could lead to tread/belt loss.  Either condition can cause a loss of vehicle control, increasing the risk of a crash.",
+      "Remedy": "Ford will notify owners, and dealers will inspect the tires, and replace them as necessary, free of charge.  The recall began on March 27, 2021.  Owners may contact Ford customer service at 1-866-436-7332.  Ford's number for this recall is 21S10.",
+      "Notes": "Owners may also contact the National Highway Traffic Safety Administration Vehicle Safety Hotline at 1-888-327-4236 (TTY 1-800-424-9153), or go to www.safercar.gov.",
+      "ModelYear": "2019",
+      "Make": "FORD",
+      "Model": "ESCAPE"
+    },
+    {
+      "Manufacturer": "Ford Motor Company",
+      "NHTSACampaignNumber": "22V413000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "10/06/2022",
+      "Component": "POWER TRAIN:AUTOMATIC TRANSMISSION:GEAR POSITION INDICATION (PRNDL)",
+      "Summary": "Ford Motor Company (Ford) is recalling certain 2013-2019 Escape, 2013-2018 C-Max, 2013-2016 Fusion, 2013-2021 Transit Connect, and  2015-2018 Edge vehicles.  The bushing that attaches the shifter cable to the transmission may degrade or detach.",
+      "Consequence": "A damaged or missing bushing may prevent the vehicle from shifting into the intended gear, and cause the vehicle to move in an unexpected direction.  Additionally, the vehicle may roll after the driver selects the 'Park' position.  Either scenario increases the risk of a crash or injury.",
+      "Remedy": "Dealers will replace the under hood shift bushing and add a protective cap over the shift cable bushing, free of charge.  Interim owner notification letters, informing owners of the safety risk, were mailed July 1, 2022.  Remedy parts are expected to be available in 4th Quarter 2022.  Owner notification letters were mailed October 27, 2022.  Owners may contact Ford customer service at 1-866-436-7332.  Ford's number for this recall is 22S43.",
+      "Notes": "Owners may also contact the National Highway Traffic Safety Administration Vehicle Safety Hotline at 1-888-327-4236 (TTY 1-800-424-9153), or go to www.nhtsa.gov.",
+      "ModelYear": "2019",
+      "Make": "FORD",
+      "Model": "ESCAPE"
+    },
+    {
+      "Manufacturer": "Ford Motor Company",
+      "NHTSACampaignNumber": "26V011000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "15/01/2026",
+      "Component": "EQUIPMENT:ELECTRICAL:ENGINE BLOCK HEATER",
+      "Summary": "Ford Motor Company (Ford) is recalling certain 2013-2018 Focus, 2013-2019 Escape, and 2015-2016 MKC vehicles equipped with a 2.0L engine. The engine block heater may crack and develop a coolant leak, causing it to short circuit when the block heater is plugged in.",
+      "Consequence": "An electrical short circuit can increase the risk of a fire.",
+      "Remedy": "Owners are advised not to plug in their block heater until the vehicle is remedied. Dealers will replace the block heater, free of charge. Owners will also have a alternative option to replace engine block heater element with a threaded plug, and remove the block heater electrical cord. Interim letters, notifying owners of the safety risk, were mailed March 6, 2026. Additional letters will be sent once the final remedy is available. Owners may contact Ford customer service at 1-866-436-7332. Ford's number for this recall is 26S01. Vehicle Identification Numbers (VINs) involved in this recall became searchable on NHTSA.gov on January 16, 2026.",
+      "Notes": null,
+      "ModelYear": "2019",
+      "Make": "FORD",
+      "Model": "ESCAPE"
+    }
+  ]
+}

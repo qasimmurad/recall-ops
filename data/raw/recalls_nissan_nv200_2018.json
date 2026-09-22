@@ -1,0 +1,38 @@
+{
+  "Count": 2,
+  "Message": "Results returned successfully",
+  "results": [
+    {
+      "Manufacturer": "Nissan North America, Inc.",
+      "NHTSACampaignNumber": "19V654000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "12/09/2019",
+      "Component": "BACK OVER PREVENTION: SENSING SYSTEM: CAMERA",
+      "Summary": "Nissan North America, Inc. (Nissan) is recalling certain 2018-2019 Nissan Altima, Armada, Frontier, Kicks, Leaf, Maxima, Murano, NV, NV200, Pathfinder, Rogue, Rogue Sport, Sentra, Titan, Titan Diesel, Versa Note and Versa Sedan vehicles, as well as Infiniti Q50, Q60, QX30 and QX80 vehicles.  Additionally included are 2019 Nissan GT-R and Taxi and Infiniti QX50, QX60, Q70, Q70L vehicles.  The back-up camera and display settings can be adjusted such that the rear view image is no longer visible and the system will retain that setting the next time the vehicle is placed in reverse.  As such, these vehicles fail to comply with the requirements of Federal Motor Vehicle Safety Standard (FMVSS) number 111, \"Rear Visibility.\"",
+      "Consequence": "The lack of an image in the back-up camera display increases the risk of a crash.",
+      "Remedy": "Nissan will notify owners in phases, having dealers update the back-up camera settings software, free of charge.  The recall began November 11, 2019 and all affected VINs should be activated.  Owners may contact Nissan customer service at 1-800-867-7669 or INFINITI customer service at 1-800-662-6200.",
+      "Notes": "Owners may also contact the National Highway Traffic Safety Administration Vehicle Safety Hotline at 1-888-327-4236 (TTY 1-800-424-9153), or go to www.safercar.gov.",
+      "ModelYear": "2018",
+      "Make": "NISSAN",
+      "Model": "NV200"
+    },
+    {
+      "Manufacturer": "Nissan North America, Inc.",
+      "NHTSACampaignNumber": "25V676000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "09/10/2025",
+      "Component": "FUEL SYSTEM, GASOLINE:DELIVERY:FUEL PUMP:CONTROL/DRIVE MODULE",
+      "Summary": "Nissan North America, Inc. (Nissan) is recalling certain 2013-2021 NV200 Van, 2014-2017, 2019 NV200 Taxi, and 2015-2018 Chevrolet City Express vehicles. The Fuel Tank Temperature (FTT) sensor harness may have been incorrectly routed, damaging wires and causing a short circuit in the fuel pump fuse.",
+      "Consequence": "A blown fuel pump fuse can cause the engine to stall, increasing the risk of a crash.",
+      "Remedy": "Dealers will inspect and reroute the FTT sensor harness or replace the fuel pump assembly as necessary, free of charge. Owner letters were mailed January 2, 2026. Owners may contact Nissan's customer service at 800-647-7261. Nissan's number for this recall is PMA56. Vehicle Identification Numbers (VINs) involved in this recall became searchable on NHTSA.gov October 10, 2025.",
+      "Notes": null,
+      "ModelYear": "2018",
+      "Make": "NISSAN",
+      "Model": "NV200"
+    }
+  ]
+}

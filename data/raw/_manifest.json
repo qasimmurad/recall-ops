@@ -1,0 +1,123 @@
+[
+  {
+    "file": "data/raw/recalls_chevrolet_express_2018.json",
+    "requested": {
+      "make": "CHEVROLET",
+      "model": "EXPRESS",
+      "model_year": "2018"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=CHEVROLET&model=EXPRESS&modelYear=2018",
+    "fetched_at": "2026-09-21T13:21:26+00:00",
+    "record_count": 6
+  },
+  {
+    "file": "data/raw/recalls_chevrolet_silverado_1500_2019.json",
+    "requested": {
+      "make": "CHEVROLET",
+      "model": "SILVERADO 1500",
+      "model_year": "2019"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=CHEVROLET&model=SILVERADO+1500&modelYear=2019",
+    "fetched_at": "2026-09-21T13:21:27+00:00",
+    "record_count": 10
+  },
+  {
+    "file": "data/raw/recalls_ford_escape_2019.json",
+    "requested": {
+      "make": "FORD",
+      "model": "ESCAPE",
+      "model_year": "2019"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=FORD&model=ESCAPE&modelYear=2019",
+    "fetched_at": "2026-09-21T13:21:27+00:00",
+    "record_count": 3
+  },
+  {
+    "file": "data/raw/recalls_ford_f_150_2018.json",
+    "requested": {
+      "make": "FORD",
+      "model": "F-150",
+      "model_year": "2018"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=FORD&model=F-150&modelYear=2018",
+    "fetched_at": "2026-09-21T13:21:28+00:00",
+    "record_count": 19
+  },
+  {
+    "file": "data/raw/recalls_ford_transit_2020.json",
+    "requested": {
+      "make": "FORD",
+      "model": "TRANSIT",
+      "model_year": "2020"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=FORD&model=TRANSIT&modelYear=2020",
+    "fetched_at": "2026-09-21T13:21:28+00:00",
+    "record_count": 9
+  },
+  {
+    "file": "data/raw/recalls_ford_transit_2021.json",
+    "requested": {
+      "make": "FORD",
+      "model": "TRANSIT",
+      "model_year": "2021"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=FORD&model=TRANSIT&modelYear=2021",
+    "fetched_at": "2026-09-21T13:21:29+00:00",
+    "record_count": 4
+  },
+  {
+    "file": "data/raw/recalls_honda_cr_v_2017.json",
+    "requested": {
+      "make": "HONDA",
+      "model": "CR-V",
+      "model_year": "2017"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=HONDA&model=CR-V&modelYear=2017",
+    "fetched_at": "2026-09-21T13:21:29+00:00",
+    "record_count": 7
+  },
+  {
+    "file": "data/raw/recalls_jeep_grand_cherokee_2018.json",
+    "requested": {
+      "make": "JEEP",
+      "model": "GRAND CHEROKEE",
+      "model_year": "2018"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=JEEP&model=GRAND+CHEROKEE&modelYear=2018",
+    "fetched_at": "2026-09-21T13:21:30+00:00",
+    "record_count": 11
+  },
+  {
+    "file": "data/raw/recalls_nissan_nv200_2018.json",
+    "requested": {
+      "make": "NISSAN",
+      "model": "NV200",
+      "model_year": "2018"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=NISSAN&model=NV200&modelYear=2018",
+    "fetched_at": "2026-09-21T13:21:30+00:00",
+    "record_count": 2
+  },
+  {
+    "file": "data/raw/recalls_ram_promaster_2019.json",
+    "requested": {
+      "make": "RAM",
+      "model": "PROMASTER",
+      "model_year": "2019"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=RAM&model=PROMASTER&modelYear=2019",
+    "fetched_at": "2026-09-21T13:21:31+00:00",
+    "record_count": 9
+  },
+  {
+    "file": "data/raw/recalls_toyota_rav4_2019.json",
+    "requested": {
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "model_year": "2019"
+    },
+    "url": "https://api.nhtsa.gov/recalls/recallsByVehicle?make=TOYOTA&model=RAV4&modelYear=2019",
+    "fetched_at": "2026-09-21T13:21:32+00:00",
+    "record_count": 7
+  }
+]

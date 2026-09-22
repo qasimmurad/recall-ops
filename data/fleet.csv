@@ -1,0 +1,41 @@
+vehicle_id,vin,make,model,model_year,depot,plate,odometer_km,assigned_driver,status
+VEH-001,K2DEG0D9PCF43ESF4,Ford,Transit,2020,Oakland,2HXX696,35262,S. Mbeki,in_service
+VEH-002,DRCJV3KHWMGN0GEDP,Ford,Transit,2020,Reno,9PLR699,145136,L. Ferreira,in_service
+VEH-003,MSFW8Y5VEH93LYK83,Ford,Transit,2020,Oakland,2UVL448,212951,L. Ferreira,in_service
+VEH-004,6EFU7EDW5V1ZB6ZLH,Ford,Transit,2020,Reno,1GKE856,87459,M. Kaminski,in_service
+VEH-005,8FL52UJ4U3Z1RKFMK,Ford,Transit,2020,Fresno,4ASV286,91706,J. Pham,in_service
+VEH-006,30XJ9D62222G72DNE,FORD ,Transit,2021,Fresno,8FDL715,32659,D. Whitfield,in_service
+VEH-007,KG0BEP1KTZ07HH867,FORD ,Transit,2021,Reno,5CED867,114037,I. Castellanos,in_service
+VEH-008,LBP0KBWFT0LZR9YRN,Ford,Transit,2021,Fresno,7HGT604,117736,A. Nguyen,in_service
+VEH-009,U7TNZ5Z0FRGR7NYP7,Ford,F-150,2018,Oakland,8XMX186,203224,D. Whitfield,in_service
+VEH-010,N7M4YF262FLLJBK6K,Ford,F-150,2018,Reno,6EUU234,23891,A. Nguyen,in_service
+VEH-011,GJ4NPBTPV9SXT3JDZ,Ford,F-150,2018,Reno,9PTE644,60470,Q. Baptiste,in_service
+VEH-012,5MAKMK7HDX7GDSNUC,Ford,F-150,2018,Oakland,9RUA878,35673,O. Sorensen,in_service
+VEH-013,99NU5979STN5J3H25,Ford,Escape,2019,Sacramento,2YHP174,77595,J. Pham,in_service
+VEH-014,K0KTJ6RG28LRL492Y,Ford,Escape,2019,Reno,4MLC839,120613,A. Nguyen,in_service
+VEH-015,65B1YV9EHRGFTUCMU,Ford,Escape,2019,Fresno,7YJN252,168426,Q. Baptiste,in_service
+VEH-016,XFUDM4EUBFTFRETH6,Chevrolet,Silverado 1500,2019,Oakland,6UPJ736,54168,B. Okafor,in_service
+VEH-017,SHLTDMNWWPV59MUZB,Chevrolet,Silverado 1500,2019,Sacramento,1AAT664,71156,Q. Baptiste,in_service
+VEH-018,5G4829WPRYNJ2ZDJA,Chevrolet,Silverado 1500,2019,Oakland,5PFB186,204594,M. Kaminski,in_service
+VEH-019,VSVC6MLU5AT0YXSCW,Chevrolet,Silverado 1500,2019,Fresno,6FAL490,41427,P. Ravichandran,in_service
+VEH-020,NS9AFTFK2C2BWWRFK,Chevrolet,Express,2018,Reno,6SEK841,191579,E. Sandoval,in_service
+VEH-021,949J9BRFBCJ0G15DB,Chevy,Express,2018,Fresno,8JAR916,37591,Q. Baptiste,in_service
+VEH-022,FE7TETSPR681E7VCN,Chevrolet,Express,2018,Oakland,3LJX861,212403,J. Pham,in_service
+VEH-023,JA7D8UGP8VV666HNW,Ram,ProMaster 1500,2019,Oakland,8AKR178,160069,O. Sorensen,in_service
+VEH-024,1PPEFKT0J9UH0R882,Ram,ProMaster 1500,2019,Oakland,3ASY561,131710,J. Pham,in_service
+VEH-025,3Z1XHYAXY2HNAVT0E,Ram,ProMaster 1500,2019,Reno,7VCM538,229939,I. Castellanos,in_service
+VEH-026,UGDVKSU49XN04B2PF,Ram,ProMaster 1500,2019,Oakland,7RWE759,98282,P. Ravichandran,in_service
+VEH-027,JL73YVWTT2SW72HLL, toyota,RAV 4,2019,Oakland,4TSU325,144999,K. Abara,in_service
+VEH-028,54JNSFMYFXS0TNB31,Toyota,RAV4,2019,Reno,9GNJ446,228980,B. Okafor,in_service
+VEH-029,0J9PFUS1254WBJC47,Toyota,RAV4,2019,Reno,1CNT975,149246,O. Sorensen,in_service
+VEH-030,GRKKG6FCAJRCWJT4H, toyota,RAV 4,2019,Oakland,2KTV296,126778,I. Castellanos,in_service
+VEH-031,AAW6UXS7SSB3WDBN8,Honda,CRV,2017,Reno,2JHY534,121846,H. Moreau,in_service
+VEH-032,Y302NAV9EP8NWNR6R,Honda,CR-V,2017,Sacramento,5DWS724,70471,H. Moreau,in_service
+VEH-033,DK2DPBK3DDM25XHFL,Honda,CR-V,2017,Sacramento,4FXT864,149109,B. Okafor,in_service
+VEH-034,10Y5LGAFUFZ3HP1ZW,Nissan,NV200,2018,Reno,2BZS300,122531,R. Yoon,in_service
+VEH-035,NX07B3S2C1C6EDTNE,Nissan,NV200,2018,Sacramento,6JLW144,91432,K. Abara,in_service
+VEH-036,WAEBRG761T48J8MAW,Nissan,NV200,2018,Fresno,4LLR470,237885,T. Kovacs,in_service
+VEH-037,N2LS3EC7XL4GETFPG,Jeep,Grand Cherokee,2018,Reno,8ZRF339,55264,N. Haddad,in_service
+VEH-038,SHVVUU0TTN5SMSSKV,Jeep,Grand Cherokee,2018,Fresno,6CNJ351,160343,Q. Baptiste,in_service
+VEH-039,G6CGA7R50CVRHDNNE,Jeep,Grand Cherokee,2018,Sacramento,9FRW366,235419,A. Nguyen,in_service
+VEH-040,ZPC0YKCPTCPAX30MW,Jeep,Grand Cherokee,2018,Oakland,4BSU595,35673,N. Haddad,in_service

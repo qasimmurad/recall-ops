@@ -1,0 +1,7 @@
+state/
+site/
+data/.raw-staging-*/
+data/raw.previous/
+__pycache__/
+*.pyc
+.DS_Store

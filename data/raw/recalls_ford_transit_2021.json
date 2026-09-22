@@ -1,0 +1,70 @@
+{
+  "Count": 4,
+  "Message": "Results returned successfully",
+  "results": [
+    {
+      "Manufacturer": "Ford Motor Company",
+      "NHTSACampaignNumber": "21V592000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "30/07/2021",
+      "Component": "SEAT BELTS:FRONT:RETRACTOR",
+      "Summary": "Ford Motor Company (Ford) is recalling certain 2021-2022 Transit and 2021 Transit Connect vehicles.  The front passenger seat belt automatic locking retractor (ALR) may deactivate early, which can prevent the child restraint system from securing properly.  As such, these vehicles fail to comply with the requirements of Federal Motor Vehicle Safety Standard number 208, \"Occupant Crash Protection.\"",
+      "Consequence": "An unsecured child restraint system can increase the risk of injury during a crash.",
+      "Remedy": "Dealers will inspect the front passenger seat belt assembly, and replace the assembly as necessary, free of charge.  Interim owner notification letters were mailed on September 14, 2021.  Owner notification letters were mailed on December 30, 2021.  Owners may contact Ford customer service at 1-866-436-7332.  Ford's number for this recall is 21C18.",
+      "Notes": "Owners may also contact the National Highway Traffic Safety Administration Vehicle Safety Hotline at 1-888-327-4236 (TTY 1-800-424-9153), or go to www.nhtsa.gov.",
+      "ModelYear": "2021",
+      "Make": "FORD",
+      "Model": "TRANSIT"
+    },
+    {
+      "Manufacturer": "QUALITY VANS",
+      "NHTSACampaignNumber": "23V499000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "19/07/2023",
+      "Component": "FUEL SYSTEM, GASOLINE:DELIVERY:HOSES, LINES/PIPING, AND FITTINGS",
+      "Summary": "Quality Vans (Quality Vans) is recalling certain 2020-2023 Ford Transit vans equipped with Onan QG 2800i EVAP generators, part number 2.8HGLAA-8303A.  The fuel hose between the inline fuel filter and the Injection Pump Module (IPM) may not be properly secured, which can cause a gas leak.",
+      "Consequence": "A gasoline leak in the presence of an ignition source may increase the risk of fire.",
+      "Remedy": "Dealers will inspect and replace the fuel hose and clamps as necessary, free of charge.  Owner notification letters were mailed August 4, 2023.  Owners may contact Quality Vans customer service at 1-480-464-7007.",
+      "Notes": "Owners may also contact the National Highway Traffic Safety Administration Vehicle Safety Hotline at 1-888-327-4236 (TTY 1-800-424-9153), or go to www.nhtsa.gov.",
+      "ModelYear": "2021",
+      "Make": "FORD",
+      "Model": "TRANSIT"
+    },
+    {
+      "Manufacturer": "Ford Motor Company",
+      "NHTSACampaignNumber": "25V442000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "27/06/2025",
+      "Component": "BACK OVER PREVENTION:SOFTWARE",
+      "Summary": "Ford Motor Company (Ford) is recalling certain 2018-2022 Transit Connect, 2019-2020 MKZ, MKX,  Edge, Continental, F-150, Nautilus, Fusion, 2019-2023 Ranger, Mustang, 2020-2021 EcoSport, Expedition, Navigator, 2020-2022 Escape, F-250 SD, Corsair, 2020-2023 Aviator, Transit, 2020-2024 Explorer, 2021-2024 Bronco Sport, and 2022-2024 Maverick vehicles. A software error may cause the rearview camera to display a blank image, or the image may remain on the display after the backing event has ended.",
+      "Consequence": "A rearview camera that displays a blank image can reduce the driver's view behind the vehicle. A rearview image that continues to be displayed after the vehicle is shifted out of reverse may distract the driver. Both of these situations can increase the risk of a crash.",
+      "Remedy": "Dealers will update the rearview camera software, free of charge. Owner notification letters were mailed September 4, 2025. Owners may contact Ford customer service at 1-866-436-7332. Ford's number for this recall is 25S72.",
+      "Notes": null,
+      "ModelYear": "2021",
+      "Make": "FORD",
+      "Model": "TRANSIT"
+    },
+    {
+      "Manufacturer": "Rollx Vans",
+      "NHTSACampaignNumber": "25V876000",
+      "parkIt": false,
+      "parkOutSide": false,
+      "overTheAirUpdate": false,
+      "ReportReceivedDate": "17/12/2025",
+      "Component": "EQUIPMENT ADAPTIVE/MOBILITY:WHEELCHAIR RESTRAINTS/SECUREMENT:LATCH/ANCHOR:",
+      "Summary": "Rollx Vans (Rollx) is recalling certain GMC Yukon, Sierra, Chevrolet Express 2500, Ford Transit, E-250, Toyota Sienna, Sienna Hybrid, Honda Odyssey, Chrysler Town and Country, Voyager, Pacifica, Dodge Grand Caravan, and Ram Promaster vehicles equipped with QRT-Deluxe and QRT-Max wheelchair restraints. Please refer to Rollx's recall report for specific model year information. The retractors may not lock, preventing the wheelchair from being properly secured.",
+      "Consequence": "An unsecured wheelchair can move during transit, increasing the risk of injury.",
+      "Remedy": "Rollx will work with Q'Straint to inspect and replace the retractors as necessary, free of charge. Owner notification letters were mailed February 5, 2026. Owners may contact Rollx's customer service at 1-800-956-6668.",
+      "Notes": null,
+      "ModelYear": "2021",
+      "Make": "FORD",
+      "Model": "TRANSIT"
+    }
+  ]
+}

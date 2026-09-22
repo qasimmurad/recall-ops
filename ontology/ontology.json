@@ -1,0 +1,262 @@
+{
+  "apiName": "baylineFleetSafety",
+  "displayName": "Bayline Fleet Safety",
+  "version": 1,
+  "roles": {
+    "safety_lead": "Fleet safety lead",
+    "depot_manager": "Depot manager"
+  },
+  "objectTypes": {
+    "Vehicle": {
+      "displayName": "Vehicle",
+      "primaryKey": "vehicleId",
+      "description": "A vehicle in the Bayline fleet, from the depot roster.",
+      "properties": {
+        "vehicleId": { "type": "string" },
+        "vin": { "type": "string" },
+        "make": { "type": "string", "description": "Canonical NHTSA spelling" },
+        "model": { "type": "string", "description": "Canonical NHTSA spelling" },
+        "modelYear": { "type": "integer" },
+        "vehicleKey": { "type": "string", "description": "MAKE|MODEL|YEAR, the join key to recall campaigns" },
+        "depot": { "type": "string" },
+        "plate": { "type": "string" },
+        "odometerKm": { "type": "integer" },
+        "assignedDriver": { "type": "string" },
+        "status": { "type": "string", "enum": ["in_service", "grounded"], "editable": true },
+        "groundedReason": { "type": "string", "editable": true },
+        "statusChangedAt": { "type": "timestamp", "editable": true }
+      }
+    },
+    "RecallCampaign": {
+      "displayName": "Recall campaign",
+      "primaryKey": "campaignNumber",
+      "description": "A safety recall published by NHTSA. Read-only: it comes from the regulator.",
+      "properties": {
+        "campaignNumber": { "type": "string" },
+        "manufacturer": { "type": "string" },
+        "component": { "type": "string" },
+        "componentGroup": { "type": "string" },
+        "summary": { "type": "string" },
+        "consequence": { "type": "string" },
+        "remedy": { "type": "string" },
+        "notes": { "type": "string" },
+        "reportReceived": { "type": "date" },
+        "parkIt": { "type": "boolean" },
+        "parkOutside": { "type": "boolean" },
+        "overTheAir": { "type": "boolean" },
+        "coveredVehicleTypes": { "type": "array<string>" },
+        "priority": { "type": "string", "enum": ["critical", "high", "normal"] },
+        "triage": { "type": "struct", "description": "Output of src/triage.py: priority, rationale, evidence" }
+      }
+    },
+    "WorkOrder": {
+      "displayName": "Work order",
+      "primaryKey": "workOrderId",
+      "description": "One recall that applies to one vehicle, and what is being done about it.",
+      "properties": {
+        "workOrderId": { "type": "string" },
+        "vehicleId": { "type": "string" },
+        "campaignNumber": { "type": "string" },
+        "priority": { "type": "string", "enum": ["critical", "high", "normal"] },
+        "recommendedAction": { "type": "string" },
+        "status": { "type": "string", "enum": ["open", "scheduled", "completed", "dismissed"], "editable": true },
+        "openedAt": { "type": "date" },
+        "dueBy": { "type": "date" },
+        "scheduledFor": { "type": "date", "editable": true },
+        "shop": { "type": "string", "editable": true },
+        "completedOn": { "type": "date", "editable": true },
+        "completionNotes": { "type": "string", "editable": true },
+        "dismissalReason": { "type": "string", "editable": true },
+        "dismissalEvidence": { "type": "string", "editable": true },
+        "lastActionAt": { "type": "timestamp", "editable": true }
+      }
+    }
+  },
+  "linkTypes": {
+    "vehicleWorkOrders": {
+      "displayName": "Work orders",
+      "from": "Vehicle",
+      "to": "WorkOrder",
+      "cardinality": "one-to-many",
+      "foreignKey": "vehicleId"
+    },
+    "campaignWorkOrders": {
+      "displayName": "Work orders",
+      "from": "RecallCampaign",
+      "to": "WorkOrder",
+      "cardinality": "one-to-many",
+      "foreignKey": "campaignNumber"
+    }
+  },
+  "actionTypes": {
+    "groundVehicle": {
+      "displayName": "Ground vehicle",
+      "description": "Take the vehicle out of service until its safety issues are resolved.",
+      "target": "vehicle",
+      "intent": "danger",
+      "submitters": ["safety_lead", "depot_manager"],
+      "parameters": {
+        "vehicle": { "type": "objectRef", "objectType": "Vehicle", "required": true },
+        "reason": {
+          "type": "text",
+          "displayName": "Reason",
+          "required": true,
+          "minLength": 10,
+          "placeholder": "e.g. Open critical recall 18V663000: steering gearbox"
+        }
+      },
+      "submissionCriteria": [
+        { "type": "propertyIn", "object": "vehicle", "property": "status", "values": ["in_service"], "message": "This vehicle is already grounded." }
+      ],
+      "edits": [
+        {
+          "type": "modify",
+          "object": "vehicle",
+          "set": { "status": "grounded", "groundedReason": { "param": "reason" }, "statusChangedAt": { "now": true } }
+        }
+      ]
+    },
+    "returnToService": {
+      "displayName": "Return to service",
+      "description": "Put a grounded vehicle back on the road. Blocked while any critical recall on it is unresolved.",
+      "target": "vehicle",
+      "intent": "primary",
+      "submitters": ["safety_lead"],
+      "parameters": {
+        "vehicle": { "type": "objectRef", "objectType": "Vehicle", "required": true },
+        "note": {
+          "type": "text",
+          "displayName": "Sign-off note",
+          "required": true,
+          "minLength": 10,
+          "placeholder": "e.g. All critical recalls closed, walk-around done"
+        }
+      },
+      "submissionCriteria": [
+        { "type": "propertyIn", "object": "vehicle", "property": "status", "values": ["grounded"], "message": "This vehicle is not grounded." },
+        {
+          "type": "noLinked",
+          "object": "vehicle",
+          "link": "vehicleWorkOrders",
+          "where": { "priority": ["critical"], "status": ["open", "scheduled"] },
+          "message": "This vehicle still has an unresolved critical recall. Complete or dismiss it first"
+        }
+      ],
+      "edits": [
+        {
+          "type": "modify",
+          "object": "vehicle",
+          "set": { "status": "in_service", "groundedReason": null, "statusChangedAt": { "now": true } }
+        }
+      ]
+    },
+    "scheduleRepair": {
+      "displayName": "Schedule repair",
+      "description": "Book the recall remedy. Manufacturers perform recall repairs free of charge at franchise dealers.",
+      "target": "workOrder",
+      "intent": "primary",
+      "submitters": ["safety_lead", "depot_manager"],
+      "parameters": {
+        "workOrder": { "type": "objectRef", "objectType": "WorkOrder", "required": true },
+        "scheduledFor": { "type": "date", "displayName": "Repair date", "required": true, "notBefore": "today" },
+        "shop": {
+          "type": "enum",
+          "displayName": "Where",
+          "required": true,
+          "options": ["Franchise dealer", "In-house shop, Oakland", "In-house shop, Reno", "Mobile technician"]
+        }
+      },
+      "submissionCriteria": [
+        { "type": "propertyIn", "object": "workOrder", "property": "status", "values": ["open", "scheduled"], "message": "This work order is already closed." }
+      ],
+      "edits": [
+        {
+          "type": "modify",
+          "object": "workOrder",
+          "set": {
+            "status": "scheduled",
+            "scheduledFor": { "param": "scheduledFor" },
+            "shop": { "param": "shop" },
+            "lastActionAt": { "now": true }
+          }
+        }
+      ]
+    },
+    "completeRepair": {
+      "displayName": "Mark repair complete",
+      "description": "Record that the recall remedy was performed on this vehicle.",
+      "target": "workOrder",
+      "intent": "primary",
+      "submitters": ["safety_lead", "depot_manager"],
+      "parameters": {
+        "workOrder": { "type": "objectRef", "objectType": "WorkOrder", "required": true },
+        "completedOn": { "type": "date", "displayName": "Completed on", "required": true, "notAfter": "today" },
+        "notes": {
+          "type": "text",
+          "displayName": "What was done",
+          "required": true,
+          "minLength": 5,
+          "placeholder": "e.g. Dealer replaced steering gearbox, repair order 48213"
+        }
+      },
+      "submissionCriteria": [
+        { "type": "propertyIn", "object": "workOrder", "property": "status", "values": ["open", "scheduled"], "message": "This work order is already closed." }
+      ],
+      "edits": [
+        {
+          "type": "modify",
+          "object": "workOrder",
+          "set": {
+            "status": "completed",
+            "completedOn": { "param": "completedOn" },
+            "completionNotes": { "param": "notes" },
+            "lastActionAt": { "now": true }
+          }
+        }
+      ]
+    },
+    "dismissWorkOrder": {
+      "displayName": "Dismiss",
+      "description": "Close a work order without a repair. Recalls match on make, model and year, so some will not apply to this exact VIN. Requires a reason and evidence.",
+      "target": "workOrder",
+      "intent": "danger",
+      "submitters": ["safety_lead"],
+      "parameters": {
+        "workOrder": { "type": "objectRef", "objectType": "WorkOrder", "required": true },
+        "reason": {
+          "type": "enum",
+          "displayName": "Reason",
+          "required": true,
+          "options": [
+            "VIN outside the recall's affected range",
+            "Remedy already performed before acquisition",
+            "Vehicle sold or retired",
+            "Duplicate of another work order"
+          ]
+        },
+        "evidence": {
+          "type": "text",
+          "displayName": "Evidence",
+          "required": true,
+          "minLength": 15,
+          "placeholder": "e.g. NHTSA VIN lookup on 2026-09-21 shows no open recall for this VIN"
+        }
+      },
+      "submissionCriteria": [
+        { "type": "propertyIn", "object": "workOrder", "property": "status", "values": ["open", "scheduled"], "message": "This work order is already closed." }
+      ],
+      "edits": [
+        {
+          "type": "modify",
+          "object": "workOrder",
+          "set": {
+            "status": "dismissed",
+            "dismissalReason": { "param": "reason" },
+            "dismissalEvidence": { "param": "evidence" },
+            "lastActionAt": { "now": true }
+          }
+        }
+      ]
+    }
+  }
+}

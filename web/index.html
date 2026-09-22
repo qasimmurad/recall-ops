@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recall Ops</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M6.6 7.4 10.9 16M17.4 7.4 13.1 16M7.5 6h9' stroke='%23738091' stroke-width='1.4' fill='none'/%3E%3Ccircle cx='5' cy='6' r='2.6' fill='%234C90F0'/%3E%3Ccircle cx='19' cy='6' r='2.6' fill='%234C90F0'/%3E%3Ccircle cx='12' cy='18' r='2.6' fill='%23E76A6E'/%3E%3C/svg%3E">
+<style>
+  /* Palette follows Blueprint, Palantir's open-source UI toolkit (dark theme). */
+  :root {
+    --bg: #1C2127;
+    --panel: #252A31;
+    --raised: #2F343C;
+    --line: #383E47;
+    --text: #F6F7F9;
+    --muted: #ABB3BF;
+    --faint: #8F99A8;
+    --blue: #8ABBFF;
+    --blue-fill: #2D72D2;
+    --blue-soft: rgba(45, 114, 210, 0.2);
+    --red: #FA999C;
+    --red-fill: #CD4246;
+    --red-soft: rgba(205, 66, 70, 0.2);
+    --orange: #FBB360;
+    --orange-fill: #C87619;
+    --orange-soft: rgba(200, 118, 25, 0.2);
+    --green: #72CA9B;
+    --green-soft: rgba(35, 133, 81, 0.24);
+    --gray-soft: rgba(143, 153, 168, 0.15);
+    --mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg); color: var(--text);
+    font: 13px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif;
+    display: grid; grid-template-rows: auto auto 1fr; height: 100vh; overflow: hidden;
+  }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  .mono { font-family: var(--mono); font-size: 12px; }
+  .muted { color: var(--muted); }
+  .faint { color: var(--faint); }
+  .small { font-size: 12px; }
+  .spacer { flex: 1; }
+  mark { background: rgba(251, 179, 96, 0.28); color: var(--text); border-radius: 2px; padding: 0 2px; }
+
+  /* Header */
+  .top { display: flex; align-items: center; gap: 16px; padding: 10px 20px; background: var(--panel); border-bottom: 1px solid var(--line); }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-name { font-weight: 600; font-size: 15px; letter-spacing: 0.01em; }
+  .brand-sub { color: var(--faint); font-size: 12px; }
+  .persona { display: flex; align-items: center; gap: 8px; color: var(--faint); font-size: 12px; }
+  select, input[type="search"], input[type="date"], input[type="text"], textarea {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 3px; height: 30px; padding: 0 8px; color: var(--text);
+  }
+  select:focus, input:focus, textarea:focus, button:focus-visible { outline: 2px solid var(--blue-fill); outline-offset: 1px; }
+  body.demo { grid-template-rows: auto auto auto 1fr; }
+  .demo-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: 7px 20px; background: var(--blue-soft); color: var(--blue); border-bottom: 1px solid var(--line); font-size: 12.5px; }
+  .demo-bar b { color: var(--text); font-weight: 600; }
+  .demo-bar a, .demo-bar button { color: var(--blue); background: none; border: 0; padding: 0; font: inherit; text-decoration: underline; cursor: pointer; }
+  .count { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 6px; border-radius: 9px; background: var(--line); font-size: 11px; line-height: 18px; text-align: center; }
+
+  /* Buttons and tags */
+  .btn { height: 30px; padding: 0 12px; border-radius: 3px; border: 1px solid var(--line); background: var(--raised); cursor: pointer; font-weight: 500; white-space: nowrap; }
+  .btn:hover { background: var(--line); }
+  .btn.primary { background: var(--blue-fill); border-color: var(--blue-fill); }
+  .btn.primary:hover { background: #215DB0; }
+  .btn.danger { background: var(--red-fill); border-color: var(--red-fill); }
+  .btn.danger:hover { background: #AC2F33; }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .tag { display: inline-flex; align-items: center; height: 18px; padding: 0 6px; border-radius: 3px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: var(--gray-soft); color: var(--muted); white-space: nowrap; }
+  .tag.critical, .tag.grounded, .tag.risk { background: var(--red-soft); color: var(--red); }
+  .tag.high, .tag.review { background: var(--orange-soft); color: var(--orange); }
+  .tag.scheduled { background: var(--blue-soft); color: var(--blue); }
+  .tag.completed, .tag.in_service { background: var(--green-soft); color: var(--green); }
+
+  /* KPIs */
+  .kpis { display: grid; grid-template-columns: 2.2fr repeat(4, 1fr); gap: 1px; background: var(--line); border-bottom: 1px solid var(--line); }
+  .kpi { background: var(--bg); border: 0; text-align: left; padding: 14px 20px 12px; cursor: pointer; }
+  .kpi:hover { background: #20252C; }
+  .kpi.on { box-shadow: inset 0 -2px 0 var(--blue-fill); background: #20252C; }
+  .kpi .value { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .kpi .label { color: var(--muted); margin-top: 2px; }
+  .kpi .sub { color: var(--faint); font-size: 12px; }
+  .kpi.alert .value { color: var(--red); }
+  .kpi.ok .value { color: var(--green); }
+
+  /* Layout */
+  main { display: grid; grid-template-columns: minmax(380px, 44%) 1fr; min-height: 0; }
+  .list-pane { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--line); background: var(--bg); }
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--panel); }
+  .filters input[type="search"] { flex: 1; min-width: 160px; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; }
+  .seg button { border: 0; background: var(--bg); padding: 0 10px; height: 28px; cursor: pointer; color: var(--muted); }
+  .seg button + button { border-left: 1px solid var(--line); }
+  .seg button.on { background: var(--raised); color: var(--text); }
+  .list-head { display: flex; align-items: center; gap: 10px; padding: 8px 14px; color: var(--faint); font-size: 12px; border-bottom: 1px solid var(--line); min-height: 34px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; padding: 0 4px 0 8px; height: 20px; border-radius: 10px; background: var(--blue-soft); color: var(--blue); }
+  .chip button { border: 0; background: none; cursor: pointer; color: inherit; font-size: 14px; line-height: 1; padding: 0 4px; }
+  .list { overflow-y: auto; flex: 1; position: relative; }
+  .list-foot { padding: 8px 14px; border-top: 1px solid var(--line); color: var(--faint); font-size: 11.5px; }
+
+  .row { display: grid; grid-template-columns: 3px 1fr auto; gap: 12px; width: 100%; padding: 9px 14px 9px 0; border: 0; border-bottom: 1px solid #2A2F36; background: none; text-align: left; cursor: pointer; }
+  .row:hover { background: rgba(255, 255, 255, 0.025); }
+  .row.selected { background: var(--blue-soft); }
+  .stripe { border-radius: 0 2px 2px 0; background: var(--line); }
+  .stripe.critical { background: var(--red-fill); }
+  .stripe.high { background: var(--orange-fill); }
+  .row-main { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .row-top { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .row-top > span { white-space: nowrap; flex-shrink: 0; }
+  .row-top > .veh { flex-shrink: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .row-sub { color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-side { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; font-size: 12px; color: var(--faint); }
+  .overdue { color: var(--red); font-weight: 600; }
+
+  /* Detail */
+  .detail { overflow-y: auto; padding: 22px 28px 48px; }
+  .detail-inner { max-width: 820px; }
+  .eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .detail h1 { font-size: 21px; line-height: 1.25; margin: 0 0 4px; font-weight: 600; }
+  .detail .sub { color: var(--muted); margin: 0 0 16px; }
+  .callout { border: 1px solid var(--line); border-left: 3px solid var(--line); border-radius: 4px; background: var(--panel); padding: 12px 16px; margin-bottom: 12px; }
+  .callout.critical { border-left-color: var(--red-fill); }
+  .callout.high { border-left-color: var(--orange-fill); }
+  .callout-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--faint); }
+  .callout-title { font-size: 15px; font-weight: 600; margin: 2px 0 8px; }
+  blockquote { margin: 0 0 6px; padding-left: 10px; border-left: 2px solid var(--line); color: var(--muted); }
+  .state-line { padding: 8px 12px; border-radius: 4px; background: var(--blue-soft); margin-bottom: 12px; }
+  .state-line.ok { background: var(--green-soft); }
+  .state-line.dim { background: var(--gray-soft); color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 12px 0 20px; }
+  .card { border: 1px solid var(--line); border-radius: 4px; background: var(--panel); padding: 14px 16px; margin-bottom: 14px; }
+  .card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .card-head h2 { font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin: 0; font-weight: 600; }
+  .card-head a { margin-left: auto; color: var(--blue); text-decoration: none; font-size: 12px; }
+  .card h3 { font-size: 12px; color: var(--faint); font-weight: 600; margin: 14px 0 4px; }
+  .card p { margin: 0; color: var(--text); }
+  .card .actions { margin: 12px 0 0; }
+  .kv { display: grid; grid-template-columns: 110px 1fr; gap: 5px 12px; margin: 0; }
+  .kv dt { color: var(--faint); }
+  .kv dd { margin: 0; }
+  .warning { background: var(--red-soft); color: var(--red); border-radius: 3px; padding: 7px 10px; margin-bottom: 10px; font-weight: 500; }
+  .note { background: var(--gray-soft); border-radius: 3px; padding: 7px 10px; margin-bottom: 10px; color: var(--muted); }
+  .mini-list { display: flex; flex-direction: column; }
+  .mini { display: flex; align-items: center; gap: 8px; border: 0; border-top: 1px solid var(--line); background: none; padding: 7px 0; text-align: left; cursor: pointer; }
+  .mini:hover span:nth-child(2) { color: var(--blue); }
+  .mini span:nth-child(2) { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lineage { margin: 0; padding-left: 18px; color: var(--muted); }
+  .lineage li { margin-bottom: 6px; }
+  .lineage b { color: var(--text); font-weight: 600; }
+  .history { list-style: none; margin: 0; padding: 0; }
+  .history > li { border-top: 1px solid var(--line); padding: 9px 0; }
+  .history > li:first-child { border-top: 0; padding-top: 0; }
+  .h-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .changes { margin: 4px 0 0; padding-left: 16px; color: var(--muted); font-size: 12px; }
+  .changes s { color: var(--faint); }
+  .empty { padding: 40px 20px; color: var(--faint); text-align: center; }
+
+  /* Dialogs */
+  dialog { border: 1px solid var(--line); border-radius: 6px; padding: 0; background: var(--panel); color: var(--text); width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 64px); }
+  dialog.wide { width: min(760px, calc(100vw - 32px)); }
+  dialog::backdrop { background: rgba(17, 20, 24, 0.72); }
+  .modal { display: flex; flex-direction: column; max-height: calc(100vh - 66px); }
+  .modal header { padding: 16px 20px 0; }
+  .modal header h2 { margin: 0 0 4px; font-size: 16px; }
+  .modal header p { margin: 0; color: var(--muted); }
+  .modal-body { padding: 14px 20px; overflow-y: auto; }
+  .modal footer { display: flex; align-items: center; gap: 8px; padding: 12px 20px; border-top: 1px solid var(--line); }
+  .target { margin-bottom: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; }
+  .field > span { font-weight: 500; }
+  .field textarea { height: auto; min-height: 72px; padding: 6px 8px; resize: vertical; }
+  .field.invalid select, .field.invalid input, .field.invalid textarea { border-color: var(--red-fill); }
+  .field-error { color: var(--red); min-height: 0; }
+  .field-error:empty { display: none; }
+  .form-error { background: var(--red-soft); color: var(--red); border-radius: 3px; padding: 8px 10px; }
+
+  .toast { position: fixed; right: 20px; bottom: 20px; background: var(--raised); border: 1px solid var(--line); border-left: 3px solid var(--green); border-radius: 4px; padding: 10px 14px; box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4); opacity: 0; transform: translateY(8px); transition: opacity 0.18s, transform 0.18s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    body { height: auto; overflow: auto; }
+    .top { flex-wrap: wrap; padding: 10px 16px; }
+    .kpis { grid-template-columns: repeat(2, 1fr); }
+    .kpi:first-child { grid-column: 1 / -1; }
+    main { grid-template-columns: 1fr; }
+    .list-pane { border-right: 0; border-bottom: 1px solid var(--line); }
+    .list { max-height: 55vh; }
+    .detail { padding: 18px 16px 40px; }
+    .row-top { flex-wrap: wrap; row-gap: 2px; }
+    .modal footer { flex-wrap: wrap; }
+    .modal footer > .faint { flex-basis: 100%; }
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M6.6 7.4 10.9 16M17.4 7.4 13.1 16M7.5 6h9" stroke="#738091" stroke-width="1.4"/>
+      <circle cx="5" cy="6" r="2.6" fill="#4C90F0"/><circle cx="19" cy="6" r="2.6" fill="#4C90F0"/><circle cx="12" cy="18" r="2.6" fill="#E76A6E"/>
+    </svg>
+    <div>
+      <div class="brand-name">Recall Ops</div>
+      <div class="brand-sub">Bayline Logistics · Fleet safety</div>
+    </div>
+  </div>
+  <span class="spacer"></span>
+  <label class="persona">Acting as <select id="persona"></select></label>
+  <button class="btn" id="audit-open">Action log<span class="count" id="audit-count">0</span></button>
+</header>
+
+<div class="demo-bar" id="demo-bar" hidden></div>
+
+<section class="kpis" id="kpis" aria-label="Fleet status"></section>
+
+<main>
+  <div class="list-pane">
+    <div class="filters">
+      <div class="seg" role="group" aria-label="Priority">
+        <button data-seg="priority" data-value="all">All</button>
+        <button data-seg="priority" data-value="critical">Critical</button>
+        <button data-seg="priority" data-value="high">High</button>
+        <button data-seg="priority" data-value="normal">Normal</button>
+      </div>
+      <div class="seg" role="group" aria-label="Status">
+        <button data-seg="status" data-value="active">Open</button>
+        <button data-seg="status" data-value="closed">Closed</button>
+        <button data-seg="status" data-value="all">All</button>
+      </div>
+      <select id="depot" aria-label="Depot"></select>
+      <input id="search" type="search" placeholder="Search vehicle, plate, recall, driver" aria-label="Search">
+    </div>
+    <div class="list-head"><span id="list-count"></span><span id="quick"></span></div>
+    <div class="list" id="list"></div>
+    <div class="list-foot" id="meta"></div>
+  </div>
+  <div class="detail" id="detail"><div class="empty">Loading…</div></div>
+</main>
+
+<dialog id="action-dialog"></dialog>
+<dialog id="audit-dialog" class="wide"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- static-demo -->
+<script>
+const ACTIVE = new Set(["open", "scheduled"]);
+const RANK = { critical: 0, high: 1, normal: 2 };
+const STATUS_LABEL = { open: "Open", scheduled: "Scheduled", completed: "Completed", dismissed: "Dismissed",
+                       in_service: "In service", grounded: "Grounded" };
+const PERSONAS = [
+  { name: "Dana Ortiz", role: "safety_lead" },
+  { name: "Sam Reyes", role: "depot_manager" },
+];
+const KPIS = [
+  { key: "atRisk", label: "Vehicles on the road with an unresolved critical recall", quick: "atRisk", status: "active",
+    tone: v => (v ? "alert" : "ok"), sub: k => `of ${k.vehicles} vehicles` },
+  { key: "grounded", label: "Grounded", quick: "grounded", status: "all" },
+  { key: "active", label: "Open work orders", quick: null, status: "active", sub: k => `of ${k.workOrders}` },
+  { key: "overdue", label: "Overdue", quick: "overdue", status: "active", tone: v => (v ? "alert" : "") },
+  { key: "closed", label: "Closed", quick: null, status: "closed" },
+];
+const QUICK_LABEL = { atRisk: "Critical, vehicle still in service", grounded: "Vehicle grounded", overdue: "Overdue" };
+
+const S = {
+  ontology: null, state: null, edits: [], selected: null, persona: 0,
+  filters: { kpi: "atRisk", quick: "atRisk", priority: "all", status: "active", depot: "all", q: "" },
+};
+try { S.persona = Number(localStorage.getItem("recallops.persona")) || 0; } catch (e) { /* storage unavailable */ }
+
+const $ = sel => document.querySelector(sel);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const vehicle = id => S.state.objects.Vehicle[id];
+const campaign = id => S.state.objects.RecallCampaign[id];
+const order = id => S.state.objects.WorkOrder[id];
+const roleTitle = role => S.ontology.roles[role] || role;
+const titleCase = s => String(s || "").toLowerCase()
+  .replace(/(^|[\s,/(-])([a-z])/g, (m, p, c) => p + c.toUpperCase())
+  .replace(/(?!^)\b(And|Or|Of|The)\b/g, w => w.toLowerCase());
+const plural = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
+function asDate(iso) { return new Date(iso.length === 10 ? `${iso}T12:00:00` : iso); }
+function shortDate(iso) { return iso ? asDate(iso).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "—"; }
+function longDate(iso) { return iso ? asDate(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—"; }
+function addDays(iso, days) { const d = asDate(iso); d.setDate(d.getDate() + days); return d.toISOString().slice(0, 10); }
+function ago(iso) {
+  const s = (Date.now() - new Date(iso)) / 1000;
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)} min ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)} h ago`;
+  return longDate(iso);
+}
+function highlight(text, phrase) {
+  const at = phrase ? text.toLowerCase().indexOf(phrase.toLowerCase()) : -1;
+  if (at < 0) return esc(text);
+  return esc(text.slice(0, at)) + "<mark>" + esc(text.slice(at, at + phrase.length)) + "</mark>" + esc(text.slice(at + phrase.length));
+}
+const statusTag = status => `<span class="tag ${status}">${esc(STATUS_LABEL[status] || status)}</span>`;
+
+// Static mode (the GitHub Pages demo): src/build_demo.py injects web/kernel.js and this flag.
+// The same API calls are answered in the browser by the ported kernel, and actions are saved
+// in this browser's storage only.
+const STATIC = window.RECALL_OPS_STATIC || null;
+const DEMO_KEY = "recallops.demo.edits.v1";
+let demoReady = null;
+
+function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+async function getJson(url) {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Couldn't load ${url} (${response.status})`);
+  return response.json();
+}
+
+async function loadDemo() {
+  const [ontology, base] = await Promise.all([getJson("data/ontology.json"), getJson("data/objects.json")]);
+  // Keep the demo evergreen: shift open and due dates as if the data had been built today.
+  const shift = Math.round((asDate(localToday()) - asDate(base.generatedAt.slice(0, 10))) / 86400000);
+  if (shift) {
+    for (const w of Object.values(base.objects.WorkOrder)) {
+      w.openedAt = addDays(w.openedAt, shift);
+      w.dueBy = addDays(w.dueBy, shift);
+    }
+  }
+  let saved = [];
+  try { saved = JSON.parse(localStorage.getItem(DEMO_KEY) || "[]"); } catch (e) { saved = []; }
+  const kernel = RecallKernel.createKernel(ontology, base.objects, Array.isArray(saved) ? saved : []);
+  kernel.generatedAt = base.generatedAt;
+  return kernel;
+}
+
+async function staticApi(path, options = {}) {
+  demoReady = demoReady || loadDemo();
+  const kernel = await demoReady;
+  const route = path.split("?")[0];
+  const view = () => RecallKernel.fleetView(kernel.snapshot(localToday()));
+  if (route === "/api/ontology") return kernel.ontology;
+  if (route === "/api/state") return view();
+  if (route === "/api/edits") return kernel.edits.slice();
+  if (route.startsWith("/api/actions/") && options.method === "POST") {
+    const body = JSON.parse(options.body);
+    let edit;
+    try {
+      edit = kernel.submit(route.slice("/api/actions/".length), body.params, body.actor, localToday());
+    } catch (error) {
+      if (error.name !== "ActionError") throw error;
+      throw Object.assign(new Error(error.message), { field: error.field });
+    }
+    try { localStorage.setItem(DEMO_KEY, JSON.stringify(kernel.edits)); } catch (e) { /* no storage: kept until reload */ }
+    return { edit, state: view() };
+  }
+  throw new Error("Not found");
+}
+
+async function api(path, options) {
+  if (STATIC) return staticApi(path, options);
+  const response = await fetch(path, options);
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(body.error || `Request failed (${response.status})`);
+    error.field = body.field;
+    throw error;
+  }
+  return body;
+}
+
+async function load() {
+  try {
+    const [ontology, state, edits] = await Promise.all([api("/api/ontology"), api("/api/state"), api("/api/edits")]);
+    Object.assign(S, { ontology, state, edits });
+  } catch (error) {
+    $("#detail").innerHTML = `<div class="empty">Couldn't ${STATIC ? "load the demo data" : "reach the Recall Ops server"}. ${esc(error.message)}</div>`;
+    return;
+  }
+  if (STATIC) {
+    document.body.classList.add("demo");
+    const bar = $("#demo-bar");
+    bar.hidden = false;
+    bar.innerHTML = `<span><b>Live demo.</b> It runs entirely in your browser, and your actions are saved only here.</span>
+      <button type="button" data-reset-demo>Reset demo</button>
+      ${STATIC.repo ? `<a href="${esc(STATIC.repo)}" target="_blank" rel="noopener">Source and write-up on GitHub ↗</a>` : ""}`;
+  }
+  $("#persona").innerHTML = PERSONAS.map((p, i) => `<option value="${i}">${esc(p.name)} · ${esc(roleTitle(p.role))}</option>`).join("");
+  $("#persona").value = String(S.persona);
+  const depots = [...new Set(Object.values(S.state.objects.Vehicle).map(v => v.depot))].sort();
+  $("#depot").innerHTML = `<option value="all">All depots</option>` + depots.map(d => `<option>${esc(d)}</option>`).join("");
+  const linked = new URLSearchParams(location.search).get("wo");
+  const deepLinked = Boolean(linked && order(linked));
+  if (deepLinked) {
+    // Keep the default inbox if the linked work order is already in it; otherwise widen the filters.
+    if (!visibleOrders().some(w => w.workOrderId === linked)) Object.assign(S.filters, { kpi: null, quick: null, status: "all" });
+    setSelected(linked, { link: true });
+  } else {
+    setSelected(visibleOrders()[0]?.workOrderId ?? null);
+    if (linked) toast(`There's no work order ${linked}. Showing the top of the inbox.`);
+  }
+  render();
+  centerSelectedRow();
+  if (deepLinked && narrow()) $("#detail").scrollIntoView({ block: "start" });
+}
+
+function render({ keepScroll = false } = {}) {
+  renderKpis();
+  renderList({ keepScroll });
+  renderDetail();
+  $("#audit-count").textContent = S.edits.length;
+  const m = S.state.meta;
+  $("#meta").textContent = `Recalls from api.nhtsa.gov · pipeline built ${longDate(m.generatedAt)} · ` +
+    `${plural(m.editCount, "action")} replayed on top` + (m.orphanedEffects ? ` · ${m.orphanedEffects} orphaned` : "") +
+    (STATIC ? " · demo dates shifted to today" : "") +
+    (m.loadWarning ? ` · Warning: ${m.loadWarning}` : "");
+}
+
+function renderKpis() {
+  const k = S.state.kpis;
+  $("#kpis").innerHTML = KPIS.map(d => {
+    const value = k[d.key];
+    const tone = d.tone ? d.tone(value) : "";
+    return `<button class="kpi ${tone} ${S.filters.kpi === d.key ? "on" : ""}" data-kpi="${d.key}">
+      <div class="value">${value}</div><div class="label">${esc(d.label)}</div>${d.sub ? `<div class="sub">${d.sub(k)}</div>` : ""}
+    </button>`;
+  }).join("");
+}
+
+function visibleOrders() {
+  const f = S.filters;
+  const q = f.q.trim().toLowerCase();
+  return Object.values(S.state.objects.WorkOrder).filter(w => {
+    const v = vehicle(w.vehicleId);
+    const c = campaign(w.campaignNumber);
+    if (f.quick === "atRisk" && !(v.atRisk && w.priority === "critical" && ACTIVE.has(w.status))) return false;
+    if (f.quick === "grounded" && v.status !== "grounded") return false;
+    if (f.quick === "overdue" && !w.overdue) return false;
+    if (f.priority !== "all" && w.priority !== f.priority) return false;
+    if (f.status === "active" && !ACTIVE.has(w.status)) return false;
+    if (f.status === "closed" && ACTIVE.has(w.status)) return false;
+    if (f.depot !== "all" && v.depot !== f.depot) return false;
+    if (q) {
+      const haystack = [w.workOrderId, v.vehicleId, v.vin, v.plate, v.make, v.model, v.depot, v.assignedDriver,
+                        c.campaignNumber, c.component, c.triage.rationale].join(" ").toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
+    return true;
+  }).sort((a, b) =>
+    RANK[a.priority] - RANK[b.priority]
+    || Number(vehicle(b.vehicleId).atRisk) - Number(vehicle(a.vehicleId).atRisk)
+    || a.dueBy.localeCompare(b.dueBy)
+    || a.workOrderId.localeCompare(b.workOrderId));
+}
+
+function rowHtml(w) {
+  const v = vehicle(w.vehicleId);
+  const c = campaign(w.campaignNumber);
+  const onRoad = w.priority === "critical" && ACTIVE.has(w.status) && v.atRisk;
+  return `<button class="row ${w.workOrderId === S.selected ? "selected" : ""}" data-wo="${esc(w.workOrderId)}">
+    <span class="stripe ${w.priority}"></span>
+    <span class="row-main">
+      <span class="row-top">
+        <span class="tag ${w.priority}">${w.priority}</span>
+        <span class="mono">${esc(v.vehicleId)}</span>
+        <span class="veh">${esc(v.make)} ${esc(v.model)} ${v.modelYear}</span>
+        <span class="faint">· ${esc(v.depot)}</span>
+      </span>
+      <span class="row-sub">${esc(c.triage.rationale)} <span class="faint">· ${esc(titleCase(c.componentGroup))}</span></span>
+    </span>
+    <span class="row-side">
+      ${onRoad ? `<span class="tag risk">On the road</span>` : statusTag(w.status)}
+      ${c.triage.needsReview ? `<span class="tag review">Needs review</span>` : ""}
+      <span class="${w.overdue ? "overdue" : ""}">${ACTIVE.has(w.status) ? `Due ${shortDate(w.dueBy)}` : ""}</span>
+    </span>
+  </button>`;
+}
+
+function renderList({ keepScroll = false } = {}) {
+  document.querySelectorAll("[data-seg]").forEach(b => b.classList.toggle("on", S.filters[b.dataset.seg] === b.dataset.value));
+  const rows = visibleOrders();
+  const list = $("#list");
+  // Keep the position only when the same list is being redrawn after an action.
+  // New filters start at the top, where the auto-selected row is.
+  const top = keepScroll ? list.scrollTop : 0;
+  $("#list-count").textContent = plural(rows.length, "work order");
+  $("#quick").innerHTML = S.filters.quick
+    ? `<span class="chip">${esc(QUICK_LABEL[S.filters.quick])}<button data-clear-quick aria-label="Clear filter">×</button></span>` : "";
+  list.innerHTML = rows.length ? rows.map(rowHtml).join("") : `<div class="empty">Nothing matches these filters.</div>`;
+  list.scrollTop = top;
+}
+
+function actionButtons(objectType, obj) {
+  const role = PERSONAS[S.persona].role;
+  const pk = obj[S.ontology.objectTypes[objectType].primaryKey];
+  const restricted = [];
+  const targeting = Object.entries(S.ontology.actionTypes).filter(([, spec]) => spec.parameters[spec.target].objectType === objectType);
+  if (!targeting.length) return "";
+  const buttons = targeting
+    // Hide actions whose simple state checks can't pass. Anything subtler is left to the kernel to reject.
+    .filter(([, spec]) => (spec.submissionCriteria || []).every(c =>
+      c.type !== "propertyIn" || c.object !== spec.target || c.values.includes(obj[c.property])))
+    .map(([name, spec]) => {
+      const allowed = spec.submitters.includes(role);
+      if (!allowed) restricted.push(`${spec.displayName} needs a ${spec.submitters.map(roleTitle).join(" or ").toLowerCase()}`);
+      return `<button class="btn ${spec.intent || ""}" data-action="${name}" data-pk="${esc(pk)}" ${allowed ? "" : "disabled"}>${esc(spec.displayName)}</button>`;
+    });
+  if (!buttons.length) return `<span class="faint small">Nothing to do here: this ${esc(S.ontology.objectTypes[objectType].displayName.toLowerCase())} is closed.</span>`;
+  return buttons.join("") + (restricted.length ? `<span class="faint small">${esc(restricted.join(" · "))}.</span>` : "");
+}
+
+function stateLine(w) {
+  if (w.status === "scheduled") return `<div class="state-line">Scheduled for <b>${longDate(w.scheduledFor)}</b> · ${esc(w.shop)}</div>`;
+  if (w.status === "completed") return `<div class="state-line ok">Completed ${longDate(w.completedOn)} · ${esc(w.completionNotes)}</div>`;
+  if (w.status === "dismissed") return `<div class="state-line dim">Dismissed: ${esc(w.dismissalReason)}. ${esc(w.dismissalEvidence)}</div>`;
+  return "";
+}
+
+function renderDetail() {
+  const w = S.selected && order(S.selected);
+  if (!w) { $("#detail").innerHTML = `<div class="empty">Select a work order.</div>`; return; }
+  const v = vehicle(w.vehicleId);
+  const c = campaign(w.campaignNumber);
+  const t = c.triage;
+  const dueText = ACTIVE.has(w.status)
+    ? `due ${longDate(w.dueBy)}${w.overdue ? ` <span class="overdue">overdue</span>` : ""}` : "closed";
+  // Any action the ontology defines on recall campaigns shows up here without UI changes.
+  const campaignActions = actionButtons("RecallCampaign", c);
+  const allOrders = Object.values(S.state.objects.WorkOrder);
+  const siblings = allOrders.filter(o => o.vehicleId === v.vehicleId && o.workOrderId !== w.workOrderId)
+    .sort((a, b) => RANK[a.priority] - RANK[b.priority] || Number(ACTIVE.has(b.status)) - Number(ACTIVE.has(a.status)));
+  const inFleet = allOrders.filter(o => o.campaignNumber === c.campaignNumber).length;
+  const history = S.edits.filter(e => e.effects.some(x => x.primaryKey === w.workOrderId || x.primaryKey === v.vehicleId)).reverse();
+  const entered = v._source.entered;
+  const wasFixed = entered.make !== entered.make.trim() || entered.model !== entered.model.trim()
+    || `${entered.make.trim().toUpperCase()} / ${entered.model.trim().toUpperCase()}` !== `${v.make} / ${v.model}`;
+
+  $("#detail").innerHTML = `<div class="detail-inner">
+    <div class="eyebrow">
+      <span class="tag ${w.priority}">${w.priority}</span>${statusTag(w.status)}
+      <span class="mono faint">${esc(w.workOrderId)}</span>
+    </div>
+    <h1 tabindex="-1">${esc(t.needsReview ? "Unclassified hazard: needs a human read" : t.rationale)}</h1>
+    <p class="sub">${esc(v.make)} ${esc(v.model)} ${v.modelYear} · <span class="mono">${esc(v.vehicleId)}</span> · ${esc(v.depot)} depot · ${esc(titleCase(c.componentGroup))}</p>
+
+    <section class="callout ${w.priority}">
+      <div class="callout-label">Recommended</div>
+      <div class="callout-title">${esc(w.recommendedAction)}</div>
+      ${t.evidence
+        ? `<blockquote>${highlight(t.evidence, t.matchedPhrase)}</blockquote>
+           ${t.cappedFrom ? `<div class="small muted">Priority capped from ${esc(t.cappedFrom)}. ${esc(t.capReason)}</div>` : ""}
+           <div class="faint small">Matched in the recall's ${esc(t.evidenceField)} by ${esc(t.engine)} · ${dueText}</div>`
+        : `<div class="small muted">None of the triage rules recognized this hazard, so it's marked high priority for a person to read today. Read the consequence below and decide.</div>
+           <div class="faint small">${esc(t.engine)} · ${dueText}</div>`}
+    </section>
+
+    ${stateLine(w)}
+    <div class="actions">${actionButtons("WorkOrder", w)}</div>
+
+    <section class="card">
+      <header class="card-head"><h2>Vehicle</h2>${statusTag(v.status)}</header>
+      ${v.atRisk ? `<div class="warning">On the road with ${plural(v.openCritical.length, "unresolved critical recall")}.</div>` : ""}
+      ${v.status === "grounded" && v.groundedReason ? `<div class="note">Grounded: ${esc(v.groundedReason)}</div>` : ""}
+      <dl class="kv">
+        <dt>Vehicle</dt><dd><span class="mono">${esc(v.vehicleId)}</span> · ${esc(v.make)} ${esc(v.model)} ${v.modelYear}</dd>
+        <dt>VIN</dt><dd class="mono">${esc(v.vin)}</dd>
+        <dt>Plate</dt><dd class="mono">${esc(v.plate)}</dd>
+        <dt>Depot</dt><dd>${esc(v.depot)}</dd>
+        <dt>Driver</dt><dd>${esc(v.assignedDriver)}</dd>
+        <dt>Odometer</dt><dd>${v.odometerKm.toLocaleString()} km</dd>
+      </dl>
+      <div class="actions">${actionButtons("Vehicle", v)}</div>
+      <h3>Other recalls on this vehicle (${siblings.length})</h3>
+      <div class="mini-list">${siblings.map(o => `<button class="mini" data-wo="${esc(o.workOrderId)}">
+        <span class="tag ${o.priority}">${o.priority}</span>
+        <span>${esc(campaign(o.campaignNumber).triage.rationale)} <span class="faint">· ${esc(o.campaignNumber)}</span></span>
+        ${statusTag(o.status)}</button>`).join("") || `<span class="faint small">None.</span>`}</div>
+    </section>
+
+    <section class="card">
+      <header class="card-head"><h2>Recall ${esc(c.campaignNumber)}</h2>
+        <a href="https://www.nhtsa.gov/recalls?nhtsaId=${encodeURIComponent(c.campaignNumber)}" target="_blank" rel="noopener">View on NHTSA ↗</a></header>
+      <dl class="kv">
+        <dt>Component</dt><dd>${esc(titleCase(c.component))}</dd>
+        <dt>Manufacturer</dt><dd>${esc(c.manufacturer)}</dd>
+        <dt>Reported</dt><dd>${longDate(c.reportReceived)}</dd>
+        <dt>In this fleet</dt><dd>${plural(inFleet, "vehicle")}</dd>
+      </dl>
+      <h3>Consequence</h3><p>${esc(c.consequence)}</p>
+      <h3>Defect</h3><p>${esc(c.summary)}</p>
+      <h3>Remedy</h3><p>${esc(c.remedy)}</p>
+      ${campaignActions ? `<div class="actions">${campaignActions}</div>` : ""}
+    </section>
+
+    <section class="card">
+      <header class="card-head"><h2>Where this came from</h2></header>
+      <ul class="lineage">
+        <li><b>Vehicle</b> from <span class="mono">${esc(v._source.file)}</span>, row ${v._source.row}.
+          ${wasFixed ? `Entered as “${esc(entered.make)}” / “${esc(entered.model)}”, normalized to ${esc(v.make)} / ${esc(v.model)}.` : ""}</li>
+        <li><b>Recall</b> from ${c._sources.map(s => `<span class="mono">${esc(s.file)}</span> record ${s.record}`).join(", ")},
+          fetched ${longDate(c._sources[0].fetchedAt)} from api.nhtsa.gov.</li>
+        <li><b>Work order</b> derived because vehicle key <span class="mono">${esc(w._derivedFrom.vehicleKey)}</span> is covered by this campaign.
+          The match is by make, model and year, not VIN.</li>
+        <li><b>Priority</b> from ${esc(t.engine)}: ${t.needsReview ? "no rule matched, so it's marked high for a human read." : `“${esc(t.rationale)}”.`}</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <header class="card-head"><h2>History</h2></header>
+      ${history.length ? `<ol class="history">${history.map(historyItem).join("")}</ol>`
+        : `<p class="faint">No actions yet. Everything above comes straight from the pipeline.</p>`}
+    </section>
+  </div>`;
+}
+
+const fmt = v => (v == null ? "—" : esc(typeof v === "string" && v.length > 90 ? `${v.slice(0, 90)}…` : v));
+function historyItem(e) {
+  const spec = S.ontology.actionTypes[e.action];
+  const changes = e.effects.filter(x => !["lastActionAt", "statusChangedAt"].includes(x.property))
+    .map(x => `<li><span class="mono faint">${esc(x.primaryKey)}</span> ${esc(x.property)}: <s>${fmt(x.before)}</s> → <b>${fmt(x.after)}</b></li>`).join("");
+  return `<li>
+    <div class="h-top"><b>${esc(spec ? spec.displayName : e.action)}</b>
+      <span class="faint">by ${esc(e.actor.name)} · ${esc(roleTitle(e.actor.role))}</span>
+      <span class="spacer"></span><span class="faint small" title="${esc(e.at)}">${esc(e.id)} · ${ago(e.at)}</span></div>
+    <ul class="changes">${changes}</ul>
+  </li>`;
+}
+
+function fieldHtml(name, rule) {
+  const label = esc(rule.displayName || name);
+  let input;
+  if (rule.type === "text") {
+    input = `<textarea name="${name}" rows="3" placeholder="${esc(rule.placeholder || "")}"></textarea>`;
+  } else if (rule.type === "enum") {
+    input = `<select name="${name}"><option value="">Choose…</option>${rule.options.map(o => `<option>${esc(o)}</option>`).join("")}</select>`;
+  } else if (rule.type === "date") {
+    const today = S.state.meta.today;
+    const value = rule.notBefore === "today" ? addDays(today, 3) : today;
+    input = `<input type="date" name="${name}" value="${value}">`;
+  } else {
+    input = `<input type="text" name="${name}" placeholder="${esc(rule.placeholder || "")}">`;
+  }
+  return `<label class="field" data-field="${name}"><span>${label}</span>${input}<small class="field-error" role="alert"></small></label>`;
+}
+
+function openAction(name, pk) {
+  const spec = S.ontology.actionTypes[name];
+  const persona = PERSONAS[S.persona];
+  const targetType = spec.parameters[spec.target].objectType;
+  const dialog = $("#action-dialog");
+  const fields = Object.entries(spec.parameters).filter(([p]) => p !== spec.target).map(([p, rule]) => fieldHtml(p, rule)).join("");
+  // Forms are generated from the ontology's parameter definitions, and validation is left to the
+  // kernel (novalidate), so the ontology is the single source of truth for what's allowed.
+  dialog.innerHTML = `<form class="modal" novalidate>
+    <header><h2>${esc(spec.displayName)}</h2><p>${esc(spec.description || "")}</p></header>
+    <div class="modal-body">
+      <div class="target"><span class="faint">${esc(S.ontology.objectTypes[targetType].displayName)}</span> <span class="mono">${esc(pk)}</span></div>
+      ${fields}
+      <div class="form-error" role="alert" hidden></div>
+    </div>
+    <footer>
+      <span class="faint small">As ${esc(persona.name)} · ${esc(roleTitle(persona.role))}</span>
+      <span class="spacer"></span>
+      <button type="button" class="btn" data-cancel>Cancel</button>
+      <button type="submit" class="btn ${spec.intent || "primary"}">${esc(spec.displayName)}</button>
+    </footer>
+  </form>`;
+  const form = dialog.querySelector("form");
+  const cancel = form.querySelector("[data-cancel]");
+  const submit = form.querySelector("[type=submit]");
+  let submitting = false;
+  // The dialog can't be dismissed while a request is in flight, so its result always lands in this form.
+  dialog.oncancel = event => { if (submitting) event.preventDefault(); };
+  cancel.addEventListener("click", () => { if (!submitting) dialog.close(); });
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    if (submitting) return;
+    const params = { [spec.target]: pk };
+    new FormData(form).forEach((value, key) => { params[key] = value; });
+    form.querySelectorAll(".field").forEach(f => { f.classList.remove("invalid"); f.querySelector(".field-error").textContent = ""; });
+    const general = form.querySelector(".form-error");
+    general.hidden = true;
+    submitting = true;
+    submit.disabled = cancel.disabled = true;
+    let focusAfter = null;
+    try {
+      const result = await api(`/api/actions/${name}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ params, actor: persona }),
+      });
+      S.state = result.state;
+      // Refetch the log rather than appending, so actions taken in other tabs show up too.
+      S.edits = await api("/api/edits").catch(() => [...S.edits, result.edit]);
+      const current = form.isConnected && dialog.open;
+      if (current) dialog.close();
+      render({ keepScroll: true });
+      if (current) focusAfterAction(name, pk);
+      toast(`${spec.displayName}: recorded as ${result.edit.id}`);
+    } catch (error) {
+      if (!(form.isConnected && dialog.open)) {
+        toast(`${spec.displayName} failed: ${error.message}`);
+      } else {
+        const field = error.field && form.querySelector(`[data-field="${error.field}"]`);
+        if (field) {
+          field.classList.add("invalid");
+          field.querySelector(".field-error").textContent = error.message;
+          focusAfter = field.querySelector("input, select, textarea");
+        } else {
+          general.textContent = error.message;
+          general.hidden = false;
+          focusAfter = submit;
+        }
+      }
+    } finally {
+      submitting = false;
+      submit.disabled = cancel.disabled = false;
+      // The submit button was disabled mid-request, which drops focus to <body>. Put it somewhere useful.
+      focusAfter?.focus();
+    }
+  });
+  dialog.showModal();
+  form.querySelector("textarea, select, input")?.focus();
+}
+
+function focusAfterAction(name, pk) {
+  const again = document.querySelector(`[data-action="${CSS.escape(name)}"][data-pk="${CSS.escape(pk)}"]`);
+  (again && !again.disabled ? again : $("#detail h1"))?.focus();
+}
+
+function openAudit() {
+  const dialog = $("#audit-dialog");
+  dialog.innerHTML = `<div class="modal">
+    <header><h2>Action log</h2>
+      <p>Every change anyone made, oldest last. It's append-only (<span class="mono">state/edits.jsonl</span>) and replayed over the pipeline output on every load, so rebuilding the data never erases a decision.</p></header>
+    <div class="modal-body">${S.edits.length ? `<ol class="history">${[...S.edits].reverse().map(historyItem).join("")}</ol>` : `<p class="faint">No actions yet.</p>`}</div>
+    <footer><span class="spacer"></span><button class="btn" data-close>Close</button></footer>
+  </div>`;
+  dialog.querySelector("[data-close]").addEventListener("click", () => dialog.close());
+  dialog.showModal();
+}
+
+function toast(text) {
+  const el = $("#toast");
+  el.textContent = text;
+  el.classList.add("show");
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => el.classList.remove("show"), 2800);
+}
+
+// Every selection change goes through here. Only a work order the user picked goes into ?wo=,
+// so the link never points at something stale, and reloading an inbox view keeps that view.
+function setSelected(id, { link = false } = {}) {
+  S.selected = id;
+  try { history.replaceState(null, "", link && id ? `?wo=${encodeURIComponent(id)}` : location.pathname); } catch (e) { /* not fatal */ }
+}
+
+function centerSelectedRow() {
+  const list = $("#list");
+  const row = list.querySelector(".row.selected");
+  if (row) list.scrollTop = row.offsetTop - (list.clientHeight - row.offsetHeight) / 2;
+}
+
+const narrow = () => window.matchMedia("(max-width: 900px)").matches;
+
+function select(id) {
+  setSelected(id, { link: true });
+  document.querySelectorAll(".row.selected").forEach(r => r.classList.remove("selected"));
+  document.querySelector(`.row[data-wo="${CSS.escape(id)}"]`)?.classList.add("selected");
+  renderDetail();
+  // On phones the layout stacks and the page scrolls, not the detail pane.
+  if (narrow()) $("#detail").scrollIntoView({ block: "start" });
+  else $("#detail").scrollTop = 0;
+}
+
+function applyKpi(key) {
+  const d = KPIS.find(k => k.key === key);
+  Object.assign(S.filters, { kpi: key, quick: d.quick, status: d.status, priority: "all", depot: "all", q: "" });
+  $("#depot").value = "all";
+  $("#search").value = "";
+  setSelected(visibleOrders()[0]?.workOrderId ?? null);
+  render();
+}
+
+document.addEventListener("click", event => {
+  const target = event.target;
+  const row = target.closest("[data-wo]");
+  if (row) return select(row.dataset.wo);
+  const action = target.closest("[data-action]");
+  if (action && !action.disabled) return openAction(action.dataset.action, action.dataset.pk);
+  const kpi = target.closest("[data-kpi]");
+  if (kpi) return applyKpi(kpi.dataset.kpi);
+  if (target.closest("[data-clear-quick]")) {
+    Object.assign(S.filters, { quick: null, kpi: null });
+    return render();
+  }
+  const seg = target.closest("[data-seg]");
+  if (seg) {
+    S.filters[seg.dataset.seg] = seg.dataset.value;
+    S.filters.kpi = null;
+    return render();
+  }
+  if (target.closest("#audit-open")) return openAudit();
+  if (target.closest("[data-reset-demo]")) {
+    try { localStorage.removeItem(DEMO_KEY); } catch (e) { /* nothing saved */ }
+    location.href = location.pathname;
+  }
+});
+$("#persona").addEventListener("change", event => {
+  S.persona = Number(event.target.value);
+  try { localStorage.setItem("recallops.persona", String(S.persona)); } catch (e) { /* storage unavailable */ }
+  renderDetail();
+});
+$("#depot").addEventListener("change", event => { S.filters.depot = event.target.value; S.filters.kpi = null; renderKpis(); renderList(); });
+$("#search").addEventListener("input", event => {
+  S.filters.q = event.target.value;
+  if (S.filters.q.trim()) S.filters.kpi = null;
+  renderKpis();
+  renderList();
+});
+// Coming back to the tab picks up changes made elsewhere: another tab, or a pipeline rebuild.
+document.addEventListener("visibilitychange", async () => {
+  if (document.hidden || !S.state || $("#action-dialog").open) return;
+  try {
+    const [state, edits] = await Promise.all([api("/api/state"), api("/api/edits")]);
+    Object.assign(S, { state, edits });
+    if (S.selected && !order(S.selected)) setSelected(visibleOrders()[0]?.workOrderId ?? null);
+    render({ keepScroll: true });
+  } catch (e) { /* keep showing what we have */ }
+});
+
+load();
+</script>
+</body>
+</html>
