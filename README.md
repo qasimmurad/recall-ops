@@ -67,7 +67,7 @@ python3 src/build_demo.py       # the static demo -> site/
 
 To clear every action, delete `state/edits.jsonl`. A running server notices and starts over.
 
-Every push runs the tests on Python 3.9 and the latest release. If they pass, GitHub Actions rebuilds the data and deploys the demo (`.github/workflows/ci.yml`).
+Every push runs the tests on Python 3.9 and the latest release. If they pass, GitHub Actions rebuilds the data and deploys the demo (`.github/workflows/ci.yml`). Any other static host can serve it too, as long as it runs the build first: `vercel.json` does that for Vercel. Serving the repository as-is gives a 404, because `site/` is generated, not committed.
 
 Things to try:
 

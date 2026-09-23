@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "echo 'no dependencies to install'",
+  "buildCommand": "python3 src/pipeline.py && python3 src/build_demo.py",
+  "outputDirectory": "site"
+}

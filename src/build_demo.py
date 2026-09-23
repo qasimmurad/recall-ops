@@ -11,13 +11,32 @@ Run python3 src/pipeline.py first.
 import json
 import os
 import pathlib
+import re
 import shutil
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SITE = ROOT / "site"
 OBJECTS = ROOT / "state" / "objects.json"
 MARKER = "<!-- static-demo -->"
+
+
+def repo_url():
+    """Where the demo's 'Source on GitHub' link points, wherever the build runs."""
+    repository = os.environ.get("GITHUB_REPOSITORY")  # GitHub Actions
+    owner, slug = os.environ.get("VERCEL_GIT_REPO_OWNER"), os.environ.get("VERCEL_GIT_REPO_SLUG")  # Vercel
+    if not repository and owner and slug:
+        repository = f"{owner}/{slug}"
+    if not repository:
+        try:
+            remote = subprocess.run(["git", "remote", "get-url", "origin"], cwd=ROOT, capture_output=True,
+                                    text=True, timeout=10).stdout.strip()
+        except (OSError, subprocess.SubprocessError):
+            remote = ""
+        match = re.search(r"github\.com[:/](.+?)(?:\.git)?$", remote)
+        repository = match.group(1) if match else None
+    return f"https://github.com/{repository}" if repository else None
 
 
 def main():
@@ -29,9 +48,7 @@ def main():
         print(f"web/index.html must contain {MARKER} exactly once.", file=sys.stderr)
         return 1
 
-    # GitHub Actions sets GITHUB_REPOSITORY (owner/name); locally there's no repo link.
-    repository = os.environ.get("GITHUB_REPOSITORY")
-    config = json.dumps({"repo": f"https://github.com/{repository}" if repository else None}).replace("</", "<\\/")
+    config = json.dumps({"repo": repo_url()}).replace("</", "<\\/")
     injected = f'<script src="kernel.js"></script>\n<script>window.RECALL_OPS_STATIC = {config};</script>'
 
     if SITE.exists():
